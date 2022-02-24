@@ -1,0 +1,24 @@
+sudo: required
+
+language: generic
+
+services: 
+  - docker
+
+before_install:
+  - echo "start creating an image with dockerfile"
+  - docker build -t ouchcs/docker-react-app -f Dockerfile.dev ./
+
+script:
+  - docker run -e CI=true ouchcs/docker-react-app npm run test -- --coverage
+
+deploy:
+  provider: elasticbeanstalk
+  region: "ap-northeast-2"
+  app: "docker-react-app"
+  env: "DockerReactApp-env"
+  bucket_name: s3_name
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
